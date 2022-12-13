@@ -67,3 +67,8 @@ while True:
     if check():
         print_f()
         break
+
+    if step == 9:
+        print('Ничья')
+        print_f()
+        break

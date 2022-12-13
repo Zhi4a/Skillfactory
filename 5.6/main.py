@@ -9,7 +9,22 @@ def print_f():
 
 def input_XY():
     while True:
-        x, y = map(int, input('Введите 2 координаты через пробел: ').split())
+        print('x - номер строки')
+        print('y - номер столбца')
+        a = input('Введите координаты через пробел: ').split()
+
+        if len(a) != 2:
+            print('Введите 2 координаты')
+            continue
+
+        x, y =  a
+
+        if not(x.isdigit()) or not(y.isdigit()):
+            print(" Введите цифры ")
+            continue
+
+        x, y = int(x), int(y)
+
         if 0 <= x <= 2 and 0 <= y <= 2:
             if field[x][y] == ' ':
                 return x, y
@@ -39,6 +54,7 @@ step = 0
 while True:
     step += 1
     print_f()
+
     if step%2 != 0:
         print('Ходит X')
         x, y = input_XY()
@@ -47,6 +63,7 @@ while True:
         print('Ходит 0')
         x, y = input_XY()
         field[x][y] = '0'
+
     if check():
         print_f()
         break

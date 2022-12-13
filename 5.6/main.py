@@ -8,15 +8,15 @@ def print_f():
     print(f'2 {field[2][0]}  {field[2][1]}  {field[2][2]}')
 
 def input_XY():
-      x, y = map(int, input('Введите 2 координаты через пробел: ').split())
-      while True:
-            if 0 <= x <= 2 and 0 <= y <= 2:
-                  if field[x][y] == ' ':
-                        return x, y
-                  else:
-                        print('Ячейка занята')
+    while True:
+        x, y = map(int, input('Введите 2 координаты через пробел: ').split())
+        if 0 <= x <= 2 and 0 <= y <= 2:
+            if field[x][y] == ' ':
+                return x, y
             else:
-                  print('Такого поля нет')
+                print('Ячейка занята')
+        else:
+            print('Такого поля нет')
 
 
 def check():
@@ -48,4 +48,5 @@ while True:
         x, y = input_XY()
         field[x][y] = '0'
     if check():
+        print_f()
         break

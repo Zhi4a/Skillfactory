@@ -9,7 +9,7 @@ class Dot:
         return self.x == other.x and self.y == other.y
 
     def __repr__(self):
-        return f'({self.x}, {self.y})'
+        return f"({self.x}, {self.y})"
 
 class BoardException(Exception):
     pass
@@ -26,7 +26,7 @@ class BoardWrongShipException(BoardException):
     pass
 
 class Ship:
-    def __init__(self, l, bow, o):
+    def __init__(self, bow, l, o):
         self.l = l
         self.bow = bow
         self.o = o
@@ -63,14 +63,14 @@ class Board:
         self.ships = []
 
     def __str__(self):
-        a = ""
-        a += "  | 1 | 2 | 3 | 4 | 5 | 6 |"
-        for i, j in enumerate(self.field):
-            a += f"\n{i + 1} | " + " | ".join(j) + " |"
+        res = ""
+        res += "  | 1 | 2 | 3 | 4 | 5 | 6 |"
+        for i, row in enumerate(self.field):
+            res += f"\n{i + 1} | " + " | ".join(row) + " |"
 
         if self.hid:
-            a = a.replace("■", "0")
-        return a
+            res = res.replace("■", "O")
+        return res
 
     def contour(self, ship, verb=False):
         near = [
@@ -175,27 +175,82 @@ class User(Player):
 
             return Dot(x - 1, y - 1)
 
+
 class Game:
-    def try_board(self):
-    lens = [3, 2, 2, 1, 1, 1, 1]
-    board = Board(size=self.size)
-    attempts = 0
-    for l in lens:
-        while True:
-            attempts += 1
-            if attempts > 2000:
-                return None
-            ship = Ship(Dot(randint(0, self.size), randint(0, self.size)), l, randint(0, 1))
-            try:
-                board.add_ship(ship)
-                break
-            except BoardWrongShipException:
-                pass
-    board.begin()
-    return board
+    def __init__(self, size=6):
+        self.size = size
+        pl = self.random_board()
+        co = self.random_board()
+        co.hid = True
+        self.ai = AI(co, pl)
+        self.us = User(pl, co)
 
     def random_board(self):
         board = None
         while board is None:
-            board = self.try_board()
+            board = self.random_place()
         return board
+
+    def random_place(self):
+        lens = [3, 2, 2, 1, 1, 1, 1]
+        board = Board(size=self.size)
+        attempts = 0
+        for l in lens:
+            while True:
+                attempts += 1
+                if attempts > 2000:
+                    return None
+                ship = Ship(Dot(randint(0, self.size), randint(0, self.size)), l, randint(0, 1))
+                try:
+                    board.add_ship(ship)
+                    break
+                except BoardWrongShipException:
+                    pass
+        board.begin()
+        return board
+
+    def greet(self):
+        print("- " * 10)
+        print("    Морской бой")
+        print("- " * 10)
+        print("формат ввода: x y")
+        print("x - номер строки")
+        print("y - номер столбца")
+
+    def loop(self):
+        num = 0
+        while True:
+            print("- " * 10)
+            print("Доска игрока:")
+            print(self.us.board)
+            print("- " * 10)
+            print("Доска ИИ:")
+            print(self.ai.board)
+            if num % 2 == 0:
+                print("- " * 10)
+                print("Ходит игрок")
+                repeat = self.us.move()
+            else:
+                print("- " * 10)
+                print("Ходит ИИ")
+                repeat = self.ai.move()
+            if repeat:
+                num -= 1
+
+            if self.ai.board.count == 7:
+                print("- " * 10)
+                print("Победа")
+                break
+
+            if self.us.board.count == 7:
+                print("- " * 10)
+                print("Поражение")
+                break
+            num += 1
+
+    def start(self):
+        self.greet()
+        self.loop()
+
+g = Game()
+g.start()

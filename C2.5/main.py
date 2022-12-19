@@ -136,6 +136,9 @@ class Player:
         self.board = board
         self.enemy = enemy
 
+    def ask(self):
+        raise NotImplementedError()
+
     def move(self):
         while True:
             try:

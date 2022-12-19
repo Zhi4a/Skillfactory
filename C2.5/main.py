@@ -174,3 +174,28 @@ class User(Player):
             x, y = int(x), int(y)
 
             return Dot(x - 1, y - 1)
+
+class Game:
+    def try_board(self):
+    lens = [3, 2, 2, 1, 1, 1, 1]
+    board = Board(size=self.size)
+    attempts = 0
+    for l in lens:
+        while True:
+            attempts += 1
+            if attempts > 2000:
+                return None
+            ship = Ship(Dot(randint(0, self.size), randint(0, self.size)), l, randint(0, 1))
+            try:
+                board.add_ship(ship)
+                break
+            except BoardWrongShipException:
+                pass
+    board.begin()
+    return board
+
+    def random_board(self):
+        board = None
+        while board is None:
+            board = self.try_board()
+        return board

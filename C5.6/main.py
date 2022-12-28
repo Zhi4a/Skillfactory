@@ -1,15 +1,9 @@
 import telebot
-import requests
-import json
+import traceback
+from extensions import APIException, Convert
+from config import TOKEN, keys
 
-bot = telebot.TeleBot('TOKEN')
-
-
-keys = {
-    'доллар': 'USD',
-    'евро': 'EUR',
-    'рубль': 'RUB'
-}
+bot = telebot.TeleBot(TOKEN)
 
 @bot.message_handler(commands=['start', 'help'])
 def help(message):
@@ -28,12 +22,19 @@ def values(message):
 
 @bot.message_handler(content_types=['text'])
 def convert(message):
-    f, t, a = message.text.split(' ')
-    url = f"https://api.apilayer.com/exchangerates_data/convert?to={t}&from={f}&amount={a}"
-    r = requests.get(url, {"apikey": "key"})
-    resp = json.loads(r.content)
-    text = f"{a} {f} = {resp['result']} {t}"
-    bot.reply_to(message, text)
+    _list = message.text.split(' ')
+    try:
+        if len(_list) != 3:
+            raise APIException('Неверное количество параметров')
+
+        result = Convert.get_price(*_list)
+    except APIException as e:
+        bot.reply_to(message, f"Ошибка:\n{e}")
+    except Exception as e:
+        traceback.print_tb(e.__traceback__)
+        bot.reply_to(message, f"Неизвестная ошибка:\n{e}")
+    else:
+        bot.reply_to(message, result)
 
 
 bot.polling(non_stop=True)
